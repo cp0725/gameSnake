@@ -1,0 +1,58 @@
+*{
+	padding: 0;
+	margin: 0;
+}
+div{
+	float: left;
+}
+#view-wrap{
+	width: 600px;
+	height: 600px;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+	background: url(../../static/back.png);
+	border-radius: 10px;
+}
+#view-wrap > div > div{
+	position: relative;
+	width: 20px;
+	height: 20px;
+	float: left;
+	text-align: center;
+	line-height: 20px;
+	font-size: 12px;
+	font-family: "Microsoft YaHei";
+	color: #7C7979;
+}
+#view-wrap b{
+	display: inline-block;
+	width: 50px;
+	height: 50px;
+	background: url(../../static/over.png);
+	position: absolute;
+	left: -15px;
+	top: -15px;
+	z-index: 2;
+}
+#view-wrap .bodys{
+	background: url(../../static/body.png);
+}
+#view-wrap .head-top{
+	background: url(../../static/head_top.png);
+}
+#view-wrap .head-bottom{
+	background: url(../../static/head_bottom.png);
+}
+#view-wrap .head-left{
+	background: url(../../static/head_left.png);
+}
+#view-wrap .head-right{
+	background: url(../../static/head_right.png);
+}
+#view-wrap .eat{
+	background: url(../../static/eat.png);
+}

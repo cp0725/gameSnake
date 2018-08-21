@@ -1,0 +1,249 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+<style>
+*{
+	padding: 0;
+	margin: 0;
+}
+div{
+	overflow: hidden;
+}
+#view-wrap{
+	width: 600px;
+	height: 600px;
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+	margin: auto;
+}
+#view-wrap > div > div{
+	width: 20px;
+	height: 20px;
+	float: left;
+	text-align: center;
+	line-height: 20px;
+	font-size: 12px;
+	font-family: 'Microsoft YaHei';
+	color: #7C7979;
+}
+</style>
+
+</head>
+<body>
+
+<script>
+/*
+	Model-View-Control
+
+	游戏的各种状态与数据结构由 Model 管理
+	View 用于显示 Model 的变化
+	用户与游戏的交互由 Control 完成
+	特点：Model完全独立，View 是 Model 的状态机，Model 与 View 都由 Control 来驱动。
+*/
+
+Array.prototype.deleteViewSnake = function(){   // 清除蛇之前的一节
+	let aViewList = document.querySelectorAll('#view-wrap > div > div')
+	aViewList[this[0] * 30 + this[1]].style.background = '#fff'
+}
+Array.prototype.getZoneViewSnake = function(){  // 渲染画布上移动的蛇
+	let aViewList = document.querySelectorAll('#view-wrap > div > div')
+	this.map((a,b) => {
+		aViewList[a[0] * 30 + a[1]].style.background = '#ccc'
+	})	
+}
+Array.prototype.getZoneViewFoot = function(){   // 渲染食物
+	let aViewList = document.querySelectorAll('#view-wrap > div > div')
+	aViewList[ this[0] * 30 + this[1] ].style.background = 'pink'
+}
+
+
+Array.prototype.getLife = function(){  // 计算碰撞
+	let life = true
+	if(this[this.length-1][0] > 29 || this[this.length-1][0] < 0 || this[this.length-1][1] > 29 || this[this.length-1][1] < 0){
+		// 撞墙了
+		life = false
+	}
+	this.map((a,b) => {
+		if(this[this.length-1][0] == a[0] && this[this.length-1][1] == a[1] && b != this.length-1){
+			// 撞自己
+			life = false
+		}
+	})
+	return life
+}
+
+
+
+/*
+	渲染视图 view
+*/ 
+let view = function(){
+	this.directionArr = ['上','下','左','右']
+	this.snake = [[parseInt(parseInt(Math.random( )*21+5)), parseInt(parseInt(Math.random( )*21+5))]] // 保持蛇头在5-25的矩阵
+	this.setViewDom = (x, y) => {
+  		let oViewWrap = document.createElement('div')
+  		oViewWrap.id = 'view-wrap'
+  		for(let i = 0; i < x; i++){
+  			let oListWrap = document.createElement('div')
+	  		for(let j = 0; j < y; j++){
+	  			let oList = document.createElement('div')
+	  			let sTxt = document.createTextNode(j)
+	  			oList.appendChild(sTxt)
+	  			oListWrap.appendChild(oList)
+	  		} 
+	  		oViewWrap.appendChild(oListWrap)		
+  		}
+  		document.getElementsByTagName('body')[0].appendChild(oViewWrap)
+	}
+	this.setSnake = () => {
+		switch(this.directionArr[parseInt(Math.random( )*4)]) {
+			case '上':
+				this.snake.push([this.snake[this.snake.length-1][0] - 1, this.snake[this.snake.length-1][1]])
+				break
+			case '下':
+				this.snake.push([this.snake[this.snake.length-1][0] + 1, this.snake[this.snake.length-1][1]])
+				break
+			case '左':
+				this.snake.push([this.snake[this.snake.length-1][0], this.snake[this.snake.length-1][1] - 1])
+				break
+			case '右':
+				this.snake.push([this.snake[this.snake.length-1][0], this.snake[this.snake.length-1][1] + 1])
+				break
+		}
+		if(this.snake.length == 6){
+			if(this.snake.getLife()){
+				// 生成的蛇没有打结
+				this.snake.getZoneViewSnake()
+			}else{
+				// 生成的蛇打结了
+				this.snake.pop()
+				this.setSnake()
+			}	
+		}else{
+			if(this.snake.getLife()){
+				// 生成的蛇没有打结
+				this.setSnake()
+			}else{
+				// 生成的蛇打结了
+				this.snake.pop()
+				this.setSnake()
+			}
+		}
+	}
+	this.setFoot = () => {
+		this.foot = [parseInt(Math.random( )*30), parseInt(Math.random( )*30)]
+		this.snake.map((a,b) => {
+			if(this.foot[0] == a[0] && this.foot[1] == a[1]){
+				this.setFoot()
+			}
+		})
+		this.foot.getZoneViewFoot()
+	}
+}
+
+let View = new view()
+View.setViewDom(30, 30) // 加载舞台dom结构
+View.setSnake()   // 初始化生成蛇
+View.setFoot()    // 初始化生成食物
+
+
+/*
+	游戏状态与数据结构 Model
+*/
+let model = function(){
+	this.snake = View.snake  // 蛇
+	this.direction = '右'  // 运动的方向 上下左右
+	this.getDirection = () => {  // 初始运动方向非左即右
+		if(this.snake[this.snake.length-1][0] == this.snake[this.snake.length-2][0] && this.snake[this.snake.length-1][1] + 1 == this.snake[this.snake.length-2][1]){
+			this.direction = '左'
+		}
+	}
+	this.move = () => {
+		switch(this.direction) {
+			case '上':
+				this.snake.push([this.snake[this.snake.length-1][0] - 1, this.snake[this.snake.length-1][1]])
+				break
+			case '下':
+				this.snake.push([this.snake[this.snake.length-1][0] + 1, this.snake[this.snake.length-1][1]])
+				break
+			case '左':
+				this.snake.push([this.snake[this.snake.length-1][0], this.snake[this.snake.length-1][1] - 1])
+				break
+			case '右':
+				this.snake.push([this.snake[this.snake.length-1][0], this.snake[this.snake.length-1][1] + 1])
+				break
+		}
+		let a = this.snake.shift()
+		 // 计算碰撞
+		if( !this.snake.getLife() ){
+			clearInterval(time)
+			return false
+			// 大结局
+		}
+		if(this.eatFoot()){
+			// 吃到了
+			this.snake.unshift(a)
+			this.snake.getZoneViewSnake()
+			View.setFoot() // 再生生一个食物
+		}else{
+			// 没吃到
+			a.deleteViewSnake()
+			this.snake.getZoneViewSnake()
+		}
+	}
+	this.eatFoot = () => {
+		if(this.snake[this.snake.length-1][0] == View.foot[0] && this.snake[this.snake.length-1][1] == View.foot[1]){
+			// 吃到了
+			return true
+		}else{
+			// 没吃到
+			return false
+		}
+	}
+}
+let Model = new model()
+	Model.getDirection()  // 计算初始运动方向
+let time = setInterval(function(){
+	Model.move() // 运动
+},250)
+
+
+/*
+	事件交互控制器 Control
+*/
+let control = function(){
+	window.onkeydown = function(evt){
+		// 左37  上38  右39  下40
+		switch(evt.keyCode) {
+			case 37:
+				if(Model.direction != '右'){
+					Model.direction = '左'
+				}
+				break
+			case 38:
+				if(Model.direction != '下'){
+					Model.direction = '上'
+				}
+				break
+			case 39:
+				if(Model.direction != '左'){
+					Model.direction = '右'
+				}
+				break
+			case 40:
+				if(Model.direction != '上'){
+					Model.direction = '下'
+				}
+				break
+		}
+	}
+}
+let Control = new control()
+
+</script>
+</body>
+</html>

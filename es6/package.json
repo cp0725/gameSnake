@@ -1,0 +1,29 @@
+{
+  "name": "game",
+  "version": "1.0.0",
+  "description": "my game",
+  "main": "index.js",
+  "scripts": {
+    "test": "n"
+  },
+  "repository": {
+    "type": "git",
+    "url": "n"
+  },
+  "keywords": [
+    "game"
+  ],
+  "author": "chuanzhang",
+  "license": "ISC",
+  "devDependencies": {
+    "babel-loader": "^7.1.4",
+    "css-loader": "^0.28.7",
+    "file-loader": "^1.1.6",
+    "latest": "^0.2.0",
+    "less-loader": "^4.0.5",
+    "style-loader": "^0.19.1"
+  },
+  "dependencies": {
+    "babel-core": "^6.26.0"
+  }
+}
