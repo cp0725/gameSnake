@@ -1,7 +1,7 @@
 # 贪吃蛇
 ------------
 >
-> **在线访问地址：** [http://cp0725.gitee.io/snaker/es6/index.html] 
+> **在线访问地址：**  https://cp0725.github.io/gameSnake/es6/index.html 
 >
 ------------
 ### 目录结构
