@@ -9,6 +9,7 @@ let model = function(View){
 			Array.prototype.direction = '左'
 		}
 	}
+	
 	this.move = () => {
 		switch(Array.prototype.direction) {
 			case '上':
